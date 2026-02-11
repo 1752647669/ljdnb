@@ -1,23 +1,19 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>系统与CPU格式匹配工具</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-
-<body class="bg-gradient-to-r from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center p-4">
-  <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-6 space-y-6">
-    <h1 class="text-2xl font-bold text-center text-gray-800">系统与CPU格式匹配</h1>
+<body >
+  <div >
+    <h1 >系统与CPU格式匹配</h1>
 
     <!-- 系统下拉菜单 -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">选择操作系统</label>
-      <select id="systemSelect"
-        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none">
+      <label >选择操作系统</label>
+      <select id="systemSelect" >
         <option value="">-- 请选择 --</option>
         <option value="UOS统信">UOS统信</option>
         <option value="银河麒麟">银河麒麟</option>
@@ -28,9 +24,8 @@
 
     <!-- CPU下拉菜单 -->
     <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">选择CPU架构</label>
-      <select id="cpuSelect"
-        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-300 focus:outline-none">
+      <label >选择CPU架构</label>
+      <select id="cpuSelect" >
         <option value="">-- 请选择 --</option>
         <option value="飞腾">飞腾</option>
         <option value="华为麒麟">华为麒麟</option>
@@ -49,19 +44,17 @@
     </div>
 
     <!-- 输出区域 -->
-    <div class="mt-4">
-      <label class="block text-sm font-medium text-gray-700 mb-1">匹配结果</label>
-      <div id="outputBox"
-        class="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-4 text-center text-gray-600">
+    <div >
+      <label >匹配结果</label>
+      <div id="outputBox" >
         请先选择系统和CPU
       </div>
     </div>
 
     <!-- 按钮 -->
-    <div class="flex justify-center">
-      <button onclick="generateOutput()"
-        class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition transform hover:scale-105">
-        <i class="fas fa-sync-alt mr-2"></i>生成格式
+    <div >
+      <button onclick="generateOutput()" class="px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition transform hover:scale-105">
+        <i ></i>生成格式
       </button>
     </div>
   </div>
@@ -110,6 +103,4 @@
     }
   </script>
 </body>
-
 </html>
-
