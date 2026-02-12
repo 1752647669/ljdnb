@@ -246,6 +246,17 @@
         padding: 15px;
       }
     }
+   
+.reverse-query-section {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid #ecf0f1;
+}
+.reverse-query-section .input-group input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.1);
+}
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -303,7 +314,9 @@
         <code>loongarch.deb</code>
       </div>
     </div>
-
+    <div class="reverse-query-section">
+	 <label class="output-label">
+	<i class="fas fa-search"></i> 反向查询</label> <p style="color: #7f8c8d; margin-bottom: 15px; font-size: 0.95rem;">输入格式（如 x64.deb），可反查对应的系统和CPU</p> <div class="input-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;"> <div> <label for="reverseSystemInput" style="display: block; margin-bottom: 8px; color: #34495e; font-weight: 600;">系统格式 (如 deb, rpm)</label> <input type="text" id="reverseSystemInput" class="custom-select" placeholder="例如: deb" style="width: 100%; padding: 16px 20px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 1rem;"> </div> <div> <label for="reverseCpuInput" style="display: block; margin-bottom: 8px; color: #34495e; font-weight: 600;">CPU架构格式 (如 arm, x64)</label> <input type="text" id="reverseCpuInput" class="custom-select" placeholder="例如: arm" style="width: 100%; padding: 16px 20px; border: 2px solid #e0e0e0; border-radius: 12px; font-size: 1rem;"> </div> </div> <div class="reverse-result" style="background: #f8f9fa; border-radius: 12px; padding: 25px; text-align: center; min-height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center;"> <div id="reverseOutput" style="font-size: 1.2rem; color: #2c3e50;"> 请输入格式进行反查 </div> <div id="reverseDetails" style="margin-top: 10px; font-size: 1rem; color: #7f8c8d;"> <!-- 详细结果将在这里显示 --> </div> </div> </div>
     <div class="footer">
       <p>选择任意选项后，结果将自动生成并复制到剪贴板</p>
       <p>当前时间：<span id="currentTime"></span></p>
@@ -339,14 +352,33 @@
       "龙芯3a5000": "loongarch",
       "龙芯3a6000": "loongarch"
     };
+   // 创建反向映射（用于根据格式查找名称）
+const reverseSystemMap = {};
+for (const [name, format] of Object.entries(systemMap)) {
+// 处理一个格式可能对应多个系统的情况（例如deb对应多个系统）
+if (!reverseSystemMap[format]) {
+reverseSystemMap[format] = [];
+}
+reverseSystemMap[format].push(name);
+}
 
+const reverseCpuMap = {};
+for (const [name, format] of Object.entries(cpuMap)) {
+if (!reverseCpuMap[format]) {
+reverseCpuMap[format] = [];
+}
+reverseCpuMap[format].push(name);
+}
     // 获取DOM元素
     const systemSelect = document.getElementById("systemSelect");
     const cpuSelect = document.getElementById("cpuSelect");
     const outputBox = document.getElementById("outputBox");
     const copyNotification = document.getElementById("copyNotification");
     const currentTimeElement = document.getElementById("currentTime");
-
+   const reverseSystemInput = document.getElementById("reverseSystemInput");
+const reverseCpuInput = document.getElementById("reverseCpuInput");
+const reverseOutput = document.getElementById("reverseOutput");
+const reverseDetails = document.getElementById("reverseDetails");
     // 更新当前时间
     function updateCurrentTime() {
       const now = new Date();
@@ -388,6 +420,58 @@
       // 复制到剪贴板
       copyToClipboard(result);
     }
+   // 执行反向查询
+// 执行反向查询
+function performReverseQuery() {
+  const sysFormat = reverseSystemInput.value.trim().toLowerCase();
+  const cpuFormat = reverseCpuInput.value.trim().toLowerCase();
+
+  // 清空之前的详细结果
+  reverseDetails.innerHTML = '';
+
+  if (!sysFormat && !cpuFormat) {
+    reverseOutput.textContent = "请输入格式进行反查";
+    reverseOutput.style.color = "#6c757d";
+    return;
+  }
+
+  let systemResults = [];
+  let cpuResults = [];
+
+  // 查询系统
+  if (sysFormat) {
+    systemResults = reverseSystemMap[sysFormat] || [];
+  }
+  // 查询CPU
+  if (cpuFormat) {
+    cpuResults = reverseCpuMap[cpuFormat] || [];
+  }
+
+  // 组合并显示结果
+  let outputText = "";
+  let detailsHtml = "";
+
+  if (systemResults.length > 0) {
+    outputText += `系统: ${systemResults.join(', ')}`;
+    detailsHtml += `<div><strong>对应系统:</strong> ${systemResults.join('、')}</div>`;
+  }
+  if (cpuResults.length > 0) {
+    if (outputText) outputText += " | ";
+    outputText += `CPU: ${cpuResults.join(', ')}`;
+    detailsHtml += `<div><strong>对应CPU架构:</strong> ${cpuResults.join('、')}</div>`;
+  }
+
+  if (outputText) {
+    reverseOutput.textContent = outputText;
+    reverseOutput.style.color = "#27ae60"; // 成功颜色
+    if (detailsHtml) {
+      reverseDetails.innerHTML = detailsHtml;
+    }
+  } else {
+    reverseOutput.textContent = "未找到匹配项，请检查输入格式";
+    reverseOutput.style.color = "#e74c3c"; // 错误颜色
+  }
+}
 
     // 复制文本到剪贴板
     function copyToClipboard(text) {
@@ -418,7 +502,13 @@
     // 监听下拉菜单变化
     systemSelect.addEventListener("change", generateOutput);
     cpuSelect.addEventListener("change", generateOutput);
+   // 为反向查询输入框绑定事件
+reverseSystemInput.addEventListener("input", performReverseQuery);
+reverseCpuInput.addEventListener("input", performReverseQuery);
 
+// 可选：添加一个按钮来手动触发查询（如果需要）
+// <button id="reverseQueryBtn" style="...">查询</button>
+// document.getElementById("reverseQueryBtn").addEventListener("click", performReverseQuery);
     // 初始状态检查
     function checkInitialState() {
       if (systemSelect.value && cpuSelect.value) {
